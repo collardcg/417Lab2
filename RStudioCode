@@ -1,0 +1,1204 @@
+# Prosser Cathey
+# 15.417 Lab 2
+# Date: 30 March 2021
+
+# Testing one the CAPM's predictions: returns should be correlated with risk
+# We test across three asset classes: stocks, bonds, and commodities
+# Stocks: AAPL, PG, and AMZN
+# Commodities: Oil (Via West Texas Intermediate Crude Oil Prices), Gold (Via London Bullion Market Gold Fixing Price), and Silver (Via London Bullion Market Silver Fixing Price)
+# Bonds: Vanguard Total Bond Market Index Fund, Vanguard High-Yield Corporate Fund, and Vanguard Long-Term Investment-Grade Fund
+
+
+library("tidyquant")
+
+AAPL <- tq_get("AAPL", from="2000-01-01",to="2020-12-31")
+PG <- tq_get("PG", from="2000-01-01",to="2020-12-31")
+AMZN <- tq_get("AMZN", from="2000-01-01",to="2020-12-31")
+OIL <- tq_get("DCOILWTICO", from="2000-01-01",to="2020-12-31", get = "economic.data")
+GOLD <- tq_get("GOLDAMGBD228NLBM", from="2000-01-01",to="2020-12-31", get = "economic.data")
+SILVER <- tq_get("SLVPRUSD", from="2000-01-01",to="2020-12-31", get = "economic.data")
+BOND1 <- tq_get("VBTLX", from="2000-01-01",to="2020-12-31")
+BOND2 <- tq_get("VWEHX", from="2000-01-01",to="2020-12-31")
+BOND3 <- tq_get("VWESX", from="2000-01-01",to="2020-12-31")
+
+OIL <- na.omit(OIL)
+GOLD <- na.omit(GOLD)
+SILVER <- na.omit(SILVER)
+BOND1 <- na.omit(BOND1)
+BOND2 <- na.omit(BOND2)
+BOND3 <- na.omit(BOND3)
+
+
+AAPL$r <- c(NA, diff(log(AAPL$adjusted))) ; AAPL <- AAPL[-1,]
+PG$r <- c(NA, diff(log(PG$adjusted))) ; PG <- PG[-1,]
+AMZN$r <- c(NA, diff(log(AMZN$adjusted))) ; AMZN <- AMZN[-1,]
+OIL$r <- c(NA, diff(log(OIL$price))) ; OIL <- OIL[-1,]
+GOLD$r <- c(NA, diff(log(GOLD$price))) ; GOLD <- GOLD[-1,]
+SILVER$r <- c(NA, diff(log(SILVER$price))) ; SILVER <- SILVER[-1,]
+BOND1$r <- c(NA, diff(log(BOND1$adjusted))) ; BOND1 <- BOND1[-1,]
+BOND2$r <- c(NA, diff(log(BOND2$adjusted))) ; BOND2 <- BOND2[-1,]
+BOND3$r <- c(NA, diff(log(BOND3$adjusted))) ; BOND3 <- BOND3[-1,]
+
+
+AAPL$R <- exp(AAPL$r) - 1
+PG$R <- exp(PG$r) - 1
+AMZN$R <- exp(AMZN$r) - 1
+OIL$R <- exp(OIL$r) - 1
+GOLD$R <- exp(GOLD$r) - 1
+SILVER$R <- exp(SILVER$r) - 1
+BOND1$R <- exp(BOND1$r) - 1
+BOND2$R <- exp(BOND2$r) - 1
+BOND3$R <- exp(BOND3$r) - 1
+
+SPX <- tq_get("^GSPC", from="2000-01-01",to="2020-12-31")
+SPX$r <- c(NA, diff(log(SPX$adjusted))) ; SPX <- SPX[-1,]
+SPX$R <- exp(SPX$r) - 1
+SPX2000 <- SPX[grepl("2000",SPX$date),]
+SPX2001 <- SPX[grepl("2001",SPX$date),]
+SPX2002 <- SPX[grepl("2002",SPX$date),]
+SPX2003 <- SPX[grepl("2003",SPX$date),]
+SPX2004 <- SPX[grepl("2004",SPX$date),]
+SPX2005 <- SPX[grepl("2005",SPX$date),]
+SPX2006 <- SPX[grepl("2006",SPX$date),]
+SPX2007 <- SPX[grepl("2007",SPX$date),]
+SPX2008 <- SPX[grepl("2008",SPX$date),]
+SPX2009 <- SPX[grepl("2009",SPX$date),]
+SPX2010 <- SPX[grepl("2010",SPX$date),]
+SPX2011 <- SPX[grepl("2011",SPX$date),]
+SPX2012 <- SPX[grepl("2012",SPX$date),]
+SPX2013 <- SPX[grepl("2013",SPX$date),]
+SPX2014 <- SPX[grepl("2014",SPX$date),]
+SPX2015 <- SPX[grepl("2015",SPX$date),]
+SPX2016 <- SPX[grepl("2016",SPX$date),]
+SPX2017 <- SPX[grepl("2017",SPX$date),]
+SPX2018 <- SPX[grepl("2018",SPX$date),]
+SPX2019 <- SPX[grepl("2019",SPX$date),]
+SPX2020 <- SPX[grepl("2020",SPX$date),]
+
+
+AAPL2000 <- AAPL[grepl("2000",AAPL$date),]
+AAPL2001 <- AAPL[grepl("2001",AAPL$date),]
+AAPL2002 <- AAPL[grepl("2002",AAPL$date),]
+AAPL2003 <- AAPL[grepl("2003",AAPL$date),]
+AAPL2004 <- AAPL[grepl("2004",AAPL$date),]
+AAPL2005 <- AAPL[grepl("2005",AAPL$date),]
+AAPL2006 <- AAPL[grepl("2006",AAPL$date),]
+AAPL2007 <- AAPL[grepl("2007",AAPL$date),]
+AAPL2008 <- AAPL[grepl("2008",AAPL$date),]
+AAPL2009 <- AAPL[grepl("2009",AAPL$date),]
+AAPL2010 <- AAPL[grepl("2010",AAPL$date),]
+AAPL2011 <- AAPL[grepl("2011",AAPL$date),]
+AAPL2012 <- AAPL[grepl("2012",AAPL$date),]
+AAPL2013 <- AAPL[grepl("2013",AAPL$date),]
+AAPL2014 <- AAPL[grepl("2014",AAPL$date),]
+AAPL2015 <- AAPL[grepl("2015",AAPL$date),]
+AAPL2016 <- AAPL[grepl("2016",AAPL$date),]
+AAPL2017 <- AAPL[grepl("2017",AAPL$date),]
+AAPL2018 <- AAPL[grepl("2018",AAPL$date),]
+AAPL2019 <- AAPL[grepl("2019",AAPL$date),]
+AAPL2020 <- AAPL[grepl("2020",AAPL$date),]
+
+loutAAPL2000 <- lm(SPX2000$R ~ AAPL2000$R )
+loutAAPL2001 <- lm(SPX2001$R ~ AAPL2001$R )
+loutAAPL2002 <- lm(SPX2002$R ~ AAPL2002$R )
+loutAAPL2003 <- lm(SPX2003$R ~ AAPL2003$R )
+loutAAPL2004 <- lm(SPX2004$R ~ AAPL2004$R )
+loutAAPL2005 <- lm(SPX2005$R ~ AAPL2005$R )
+loutAAPL2006 <- lm(SPX2006$R ~ AAPL2006$R )
+loutAAPL2007 <- lm(SPX2007$R ~ AAPL2007$R )
+loutAAPL2008 <- lm(SPX2008$R ~ AAPL2008$R )
+loutAAPL2009 <- lm(SPX2009$R ~ AAPL2009$R)
+loutAAPL2010 <- lm(SPX2010$R ~ AAPL2010$R)
+loutAAPL2011 <- lm(SPX2011$R ~ AAPL2011$R)
+loutAAPL2012 <- lm(SPX2012$R ~ AAPL2012$R )
+loutAAPL2013 <- lm(SPX2013$R ~ AAPL2013$R )
+loutAAPL2014 <- lm(SPX2014$R ~ AAPL2014$R )
+loutAAPL2015 <- lm(SPX2015$R ~ AAPL2015$R )
+loutAAPL2016 <- lm(SPX2016$R ~ AAPL2016$R )
+loutAAPL2017 <- lm(SPX2017$R ~ AAPL2017$R )
+loutAAPL2018 <- lm(SPX2018$R ~ AAPL2018$R )
+loutAAPL2019 <- lm(SPX2019$R ~ AAPL2019$R )
+loutAAPL2020 <- lm(SPX2020$R ~ AAPL2020$R )
+
+AAPLbeta <- c(loutAAPL2000$coefficients[2],
+              loutAAPL2001$coefficients[2],
+              loutAAPL2002$coefficients[2],
+              loutAAPL2003$coefficients[2],
+              loutAAPL2004$coefficients[2],
+              loutAAPL2005$coefficients[2],
+              loutAAPL2006$coefficients[2],
+              loutAAPL2007$coefficients[2],
+              loutAAPL2008$coefficients[2],
+              loutAAPL2009$coefficients[2],
+              loutAAPL2010$coefficients[2],
+              loutAAPL2011$coefficients[2],
+              loutAAPL2012$coefficients[2],
+              loutAAPL2013$coefficients[2],
+              loutAAPL2014$coefficients[2],
+              loutAAPL2015$coefficients[2],
+              loutAAPL2016$coefficients[2],
+              loutAAPL2017$coefficients[2],
+              loutAAPL2018$coefficients[2],
+              loutAAPL2019$coefficients[2],
+              loutAAPL2020$coefficients[2])
+
+AAPLsd <- c(
+  sd(AAPL2000$R),
+  sd(AAPL2001$R),
+  sd(AAPL2002$R),
+  sd(AAPL2003$R),
+  sd(AAPL2004$R),
+  sd(AAPL2005$R),
+  sd(AAPL2006$R),
+  sd(AAPL2007$R),
+  sd(AAPL2008$R),
+  sd(AAPL2009$R),
+  sd(AAPL2010$R),
+  sd(AAPL2011$R),
+  sd(AAPL2012$R),
+  sd(AAPL2013$R),
+  sd(AAPL2014$R),
+  sd(AAPL2015$R),
+  sd(AAPL2016$R),
+  sd(AAPL2017$R),
+  sd(AAPL2018$R),
+  sd(AAPL2019$R),
+  sd(AAPL2020$R)
+)
+
+AAPLdf <- cbind(AAPLbeta,AAPLsd)
+AAPLdf <- cbind(AAPLdf, c("2000",
+                          "2001",
+                          "2002",
+                          "2003",
+                          "2004",
+                          "2005",
+                          "2006",
+                          "2007",
+                          "2008",
+                          "2009",
+                          "2010",
+                          "2011",
+                          "2012",
+                          "2013",
+                          "2014",
+                          "2015",
+                          "2016",
+                          "2017",
+                          "2018",
+                          "2019",
+                          "2020"))
+colnames(AAPLdf)[3] <- "date"
+
+PG2000 <- PG[grepl("2000",PG$date),]
+PG2001 <- PG[grepl("2001",PG$date),]
+PG2002 <- PG[grepl("2002",PG$date),]
+PG2003 <- PG[grepl("2003",PG$date),]
+PG2004 <- PG[grepl("2004",PG$date),]
+PG2005 <- PG[grepl("2005",PG$date),]
+PG2006 <- PG[grepl("2006",PG$date),]
+PG2007 <- PG[grepl("2007",PG$date),]
+PG2008 <- PG[grepl("2008",PG$date),]
+PG2009 <- PG[grepl("2009",PG$date),]
+PG2010 <- PG[grepl("2010",PG$date),]
+PG2011 <- PG[grepl("2011",PG$date),]
+PG2012 <- PG[grepl("2012",PG$date),]
+PG2013 <- PG[grepl("2013",PG$date),]
+PG2014 <- PG[grepl("2014",PG$date),]
+PG2015 <- PG[grepl("2015",PG$date),]
+PG2016 <- PG[grepl("2016",PG$date),]
+PG2017 <- PG[grepl("2017",PG$date),]
+PG2018 <- PG[grepl("2018",PG$date),]
+PG2019 <- PG[grepl("2019",PG$date),]
+PG2020 <- PG[grepl("2020",PG$date),]
+
+loutPG2000 <- lm(SPX2000$R ~ PG2000$R )
+loutPG2001 <- lm(SPX2001$R ~ PG2001$R )
+loutPG2002 <- lm(SPX2002$R ~ PG2002$R )
+loutPG2003 <- lm(SPX2003$R ~ PG2003$R )
+loutPG2004 <- lm(SPX2004$R ~ PG2004$R )
+loutPG2005 <- lm(SPX2005$R ~ PG2005$R )
+loutPG2006 <- lm(SPX2006$R ~ PG2006$R )
+loutPG2007 <- lm(SPX2007$R ~ PG2007$R )
+loutPG2008 <- lm(SPX2008$R ~ PG2008$R )
+loutPG2009 <- lm(SPX2009$R ~ PG2009$R)
+loutPG2010 <- lm(SPX2010$R ~ PG2010$R)
+loutPG2011 <- lm(SPX2011$R ~ PG2011$R)
+loutPG2012 <- lm(SPX2012$R ~ PG2012$R )
+loutPG2013 <- lm(SPX2013$R ~ PG2013$R )
+loutPG2014 <- lm(SPX2014$R ~ PG2014$R )
+loutPG2015 <- lm(SPX2015$R ~ PG2015$R )
+loutPG2016 <- lm(SPX2016$R ~ PG2016$R )
+loutPG2017 <- lm(SPX2017$R ~ PG2017$R )
+loutPG2018 <- lm(SPX2018$R ~ PG2018$R )
+loutPG2019 <- lm(SPX2019$R ~ PG2019$R )
+loutPG2020 <- lm(SPX2020$R ~ PG2020$R )
+
+PGbeta <- c(loutPG2000$coefficients[2],
+              loutPG2001$coefficients[2],
+              loutPG2002$coefficients[2],
+              loutPG2003$coefficients[2],
+              loutPG2004$coefficients[2],
+              loutPG2005$coefficients[2],
+              loutPG2006$coefficients[2],
+              loutPG2007$coefficients[2],
+              loutPG2008$coefficients[2],
+              loutPG2009$coefficients[2],
+              loutPG2010$coefficients[2],
+              loutPG2011$coefficients[2],
+              loutPG2012$coefficients[2],
+              loutPG2013$coefficients[2],
+              loutPG2014$coefficients[2],
+              loutPG2015$coefficients[2],
+              loutPG2016$coefficients[2],
+              loutPG2017$coefficients[2],
+              loutPG2018$coefficients[2],
+              loutPG2019$coefficients[2],
+              loutPG2020$coefficients[2])
+
+PGsd <- c(
+  sd(PG2000$R),
+  sd(PG2001$R),
+  sd(PG2002$R),
+  sd(PG2003$R),
+  sd(PG2004$R),
+  sd(PG2005$R),
+  sd(PG2006$R),
+  sd(PG2007$R),
+  sd(PG2008$R),
+  sd(PG2009$R),
+  sd(PG2010$R),
+  sd(PG2011$R),
+  sd(PG2012$R),
+  sd(PG2013$R),
+  sd(PG2014$R),
+  sd(PG2015$R),
+  sd(PG2016$R),
+  sd(PG2017$R),
+  sd(PG2018$R),
+  sd(PG2019$R),
+  sd(PG2020$R)
+)
+
+PGdf <- cbind(PGbeta,PGsd)
+PGdf <- cbind(PGdf, c("2000",
+                          "2001",
+                          "2002",
+                          "2003",
+                          "2004",
+                          "2005",
+                          "2006",
+                          "2007",
+                          "2008",
+                          "2009",
+                          "2010",
+                          "2011",
+                          "2012",
+                          "2013",
+                          "2014",
+                          "2015",
+                          "2016",
+                          "2017",
+                          "2018",
+                          "2019",
+                          "2020"))
+colnames(PGdf)[3] <- "date"
+
+AMZN2000 <- AMZN[grepl("2000",AMZN$date),]
+AMZN2001 <- AMZN[grepl("2001",AMZN$date),]
+AMZN2002 <- AMZN[grepl("2002",AMZN$date),]
+AMZN2003 <- AMZN[grepl("2003",AMZN$date),]
+AMZN2004 <- AMZN[grepl("2004",AMZN$date),]
+AMZN2005 <- AMZN[grepl("2005",AMZN$date),]
+AMZN2006 <- AMZN[grepl("2006",AMZN$date),]
+AMZN2007 <- AMZN[grepl("2007",AMZN$date),]
+AMZN2008 <- AMZN[grepl("2008",AMZN$date),]
+AMZN2009 <- AMZN[grepl("2009",AMZN$date),]
+AMZN2010 <- AMZN[grepl("2010",AMZN$date),]
+AMZN2011 <- AMZN[grepl("2011",AMZN$date),]
+AMZN2012 <- AMZN[grepl("2012",AMZN$date),]
+AMZN2013 <- AMZN[grepl("2013",AMZN$date),]
+AMZN2014 <- AMZN[grepl("2014",AMZN$date),]
+AMZN2015 <- AMZN[grepl("2015",AMZN$date),]
+AMZN2016 <- AMZN[grepl("2016",AMZN$date),]
+AMZN2017 <- AMZN[grepl("2017",AMZN$date),]
+AMZN2018 <- AMZN[grepl("2018",AMZN$date),]
+AMZN2019 <- AMZN[grepl("2019",AMZN$date),]
+AMZN2020 <- AMZN[grepl("2020",AMZN$date),]
+
+loutAMZN2000 <- lm(SPX2000$R ~ AMZN2000$R )
+loutAMZN2001 <- lm(SPX2001$R ~ AMZN2001$R )
+loutAMZN2002 <- lm(SPX2002$R ~ AMZN2002$R )
+loutAMZN2003 <- lm(SPX2003$R ~ AMZN2003$R )
+loutAMZN2004 <- lm(SPX2004$R ~ AMZN2004$R )
+loutAMZN2005 <- lm(SPX2005$R ~ AMZN2005$R )
+loutAMZN2006 <- lm(SPX2006$R ~ AMZN2006$R )
+loutAMZN2007 <- lm(SPX2007$R ~ AMZN2007$R )
+loutAMZN2008 <- lm(SPX2008$R ~ AMZN2008$R )
+loutAMZN2009 <- lm(SPX2009$R ~ AMZN2009$R)
+loutAMZN2010 <- lm(SPX2010$R ~ AMZN2010$R)
+loutAMZN2011 <- lm(SPX2011$R ~ AMZN2011$R)
+loutAMZN2012 <- lm(SPX2012$R ~ AMZN2012$R )
+loutAMZN2013 <- lm(SPX2013$R ~ AMZN2013$R )
+loutAMZN2014 <- lm(SPX2014$R ~ AMZN2014$R )
+loutAMZN2015 <- lm(SPX2015$R ~ AMZN2015$R )
+loutAMZN2016 <- lm(SPX2016$R ~ AMZN2016$R )
+loutAMZN2017 <- lm(SPX2017$R ~ AMZN2017$R )
+loutAMZN2018 <- lm(SPX2018$R ~ AMZN2018$R )
+loutAMZN2019 <- lm(SPX2019$R ~ AMZN2019$R )
+loutAMZN2020 <- lm(SPX2020$R ~ AMZN2020$R )
+
+AMZNbeta <- c(loutAMZN2000$coefficients[2],
+            loutAMZN2001$coefficients[2],
+            loutAMZN2002$coefficients[2],
+            loutAMZN2003$coefficients[2],
+            loutAMZN2004$coefficients[2],
+            loutAMZN2005$coefficients[2],
+            loutAMZN2006$coefficients[2],
+            loutAMZN2007$coefficients[2],
+            loutAMZN2008$coefficients[2],
+            loutAMZN2009$coefficients[2],
+            loutAMZN2010$coefficients[2],
+            loutAMZN2011$coefficients[2],
+            loutAMZN2012$coefficients[2],
+            loutAMZN2013$coefficients[2],
+            loutAMZN2014$coefficients[2],
+            loutAMZN2015$coefficients[2],
+            loutAMZN2016$coefficients[2],
+            loutAMZN2017$coefficients[2],
+            loutAMZN2018$coefficients[2],
+            loutAMZN2019$coefficients[2],
+            loutAMZN2020$coefficients[2])
+
+AMZNsd <- c(
+  sd(AMZN2000$R),
+  sd(AMZN2001$R),
+  sd(AMZN2002$R),
+  sd(AMZN2003$R),
+  sd(AMZN2004$R),
+  sd(AMZN2005$R),
+  sd(AMZN2006$R),
+  sd(AMZN2007$R),
+  sd(AMZN2008$R),
+  sd(AMZN2009$R),
+  sd(AMZN2010$R),
+  sd(AMZN2011$R),
+  sd(AMZN2012$R),
+  sd(AMZN2013$R),
+  sd(AMZN2014$R),
+  sd(AMZN2015$R),
+  sd(AMZN2016$R),
+  sd(AMZN2017$R),
+  sd(AMZN2018$R),
+  sd(AMZN2019$R),
+  sd(AMZN2020$R)
+)
+
+AMZNdf <- cbind(AMZNbeta,AMZNsd)
+AMZNdf <- cbind(AMZNdf, c("2000",
+                      "2001",
+                      "2002",
+                      "2003",
+                      "2004",
+                      "2005",
+                      "2006",
+                      "2007",
+                      "2008",
+                      "2009",
+                      "2010",
+                      "2011",
+                      "2012",
+                      "2013",
+                      "2014",
+                      "2015",
+                      "2016",
+                      "2017",
+                      "2018",
+                      "2019",
+                      "2020"))
+colnames(AMZNdf)[3] <- "date"
+
+SPX <- tq_get("^GSPC", from="2000-01-01",to="2020-12-31")
+SPX$r <- c(NA, diff(log(SPX$adjusted))) ; SPX <- SPX[-1,]
+SPX$R <- exp(SPX$r) - 1
+SPX <- SPX[SPX$date %in% OIL$date,]
+SPX2000 <- SPX[grepl("2000",SPX$date),]
+SPX2001 <- SPX[grepl("2001",SPX$date),]
+SPX2002 <- SPX[grepl("2002",SPX$date),]
+SPX2003 <- SPX[grepl("2003",SPX$date),]
+SPX2004 <- SPX[grepl("2004",SPX$date),]
+SPX2005 <- SPX[grepl("2005",SPX$date),]
+SPX2006 <- SPX[grepl("2006",SPX$date),]
+SPX2007 <- SPX[grepl("2007",SPX$date),]
+SPX2008 <- SPX[grepl("2008",SPX$date),]
+SPX2009 <- SPX[grepl("2009",SPX$date),]
+SPX2010 <- SPX[grepl("2010",SPX$date),]
+SPX2011 <- SPX[grepl("2011",SPX$date),]
+SPX2012 <- SPX[grepl("2012",SPX$date),]
+SPX2013 <- SPX[grepl("2013",SPX$date),]
+SPX2014 <- SPX[grepl("2014",SPX$date),]
+SPX2015 <- SPX[grepl("2015",SPX$date),]
+SPX2016 <- SPX[grepl("2016",SPX$date),]
+SPX2017 <- SPX[grepl("2017",SPX$date),]
+SPX2018 <- SPX[grepl("2018",SPX$date),]
+SPX2019 <- SPX[grepl("2019",SPX$date),]
+SPX2020 <- SPX[grepl("2020",SPX$date),]
+
+OIL <- OIL[OIL$date %in% SPX$date,]
+OIL2000 <- OIL[grepl("2000",OIL$date),]
+OIL2001 <- OIL[grepl("2001",OIL$date),]
+OIL2002 <- OIL[grepl("2002",OIL$date),]
+OIL2003 <- OIL[grepl("2003",OIL$date),]
+OIL2004 <- OIL[grepl("2004",OIL$date),]
+OIL2005 <- OIL[grepl("2005",OIL$date),]
+OIL2006 <- OIL[grepl("2006",OIL$date),]
+OIL2007 <- OIL[grepl("2007",OIL$date),]
+OIL2008 <- OIL[grepl("2008",OIL$date),]
+OIL2009 <- OIL[grepl("2009",OIL$date),]
+OIL2010 <- OIL[grepl("2010",OIL$date),]
+OIL2011 <- OIL[grepl("2011",OIL$date),]
+OIL2012 <- OIL[grepl("2012",OIL$date),]
+OIL2013 <- OIL[grepl("2013",OIL$date),]
+OIL2014 <- OIL[grepl("2014",OIL$date),]
+OIL2015 <- OIL[grepl("2015",OIL$date),]
+OIL2016 <- OIL[grepl("2016",OIL$date),]
+OIL2017 <- OIL[grepl("2017",OIL$date),]
+OIL2018 <- OIL[grepl("2018",OIL$date),]
+OIL2019 <- OIL[grepl("2019",OIL$date),]
+OIL2020 <- OIL[grepl("2020",OIL$date),]
+
+loutOIL2000 <- lm(SPX2000$R ~ OIL2000$R )
+loutOIL2001 <- lm(SPX2001$R ~ OIL2001$R )
+loutOIL2002 <- lm(SPX2002$R ~ OIL2002$R )
+loutOIL2003 <- lm(SPX2003$R ~ OIL2003$R )
+loutOIL2004 <- lm(SPX2004$R ~ OIL2004$R )
+loutOIL2005 <- lm(SPX2005$R ~ OIL2005$R )
+loutOIL2006 <- lm(SPX2006$R ~ OIL2006$R )
+loutOIL2007 <- lm(SPX2007$R ~ OIL2007$R )
+loutOIL2008 <- lm(SPX2008$R ~ OIL2008$R )
+loutOIL2009 <- lm(SPX2009$R ~ OIL2009$R)
+loutOIL2010 <- lm(SPX2010$R ~ OIL2010$R)
+loutOIL2011 <- lm(SPX2011$R ~ OIL2011$R)
+loutOIL2012 <- lm(SPX2012$R ~ OIL2012$R )
+loutOIL2013 <- lm(SPX2013$R ~ OIL2013$R )
+loutOIL2014 <- lm(SPX2014$R ~ OIL2014$R )
+loutOIL2015 <- lm(SPX2015$R ~ OIL2015$R )
+loutOIL2016 <- lm(SPX2016$R ~ OIL2016$R )
+loutOIL2017 <- lm(SPX2017$R ~ OIL2017$R )
+loutOIL2018 <- lm(SPX2018$R ~ OIL2018$R )
+loutOIL2019 <- lm(SPX2019$R ~ OIL2019$R )
+loutOIL2020 <- lm(SPX2020$R ~ OIL2020$R )
+
+OILbeta <- c(loutOIL2000$coefficients[2],
+            loutOIL2001$coefficients[2],
+            loutOIL2002$coefficients[2],
+            loutOIL2003$coefficients[2],
+            loutOIL2004$coefficients[2],
+            loutOIL2005$coefficients[2],
+            loutOIL2006$coefficients[2],
+            loutOIL2007$coefficients[2],
+            loutOIL2008$coefficients[2],
+            loutOIL2009$coefficients[2],
+            loutOIL2010$coefficients[2],
+            loutOIL2011$coefficients[2],
+            loutOIL2012$coefficients[2],
+            loutOIL2013$coefficients[2],
+            loutOIL2014$coefficients[2],
+            loutOIL2015$coefficients[2],
+            loutOIL2016$coefficients[2],
+            loutOIL2017$coefficients[2],
+            loutOIL2018$coefficients[2],
+            loutOIL2019$coefficients[2],
+            loutOIL2020$coefficients[2])
+
+OILsd <- c(
+  sd(OIL2000$R),
+  sd(OIL2001$R),
+  sd(OIL2002$R),
+  sd(OIL2003$R),
+  sd(OIL2004$R),
+  sd(OIL2005$R),
+  sd(OIL2006$R),
+  sd(OIL2007$R),
+  sd(OIL2008$R),
+  sd(OIL2009$R),
+  sd(OIL2010$R),
+  sd(OIL2011$R),
+  sd(OIL2012$R),
+  sd(OIL2013$R),
+  sd(OIL2014$R),
+  sd(OIL2015$R),
+  sd(OIL2016$R),
+  sd(OIL2017$R),
+  sd(OIL2018$R),
+  sd(OIL2019$R),
+  sd(OIL2020$R)
+)
+
+OILdf <- cbind(OILbeta,OILsd)
+OILdf <- cbind(OILdf, c("2000",
+                      "2001",
+                      "2002",
+                      "2003",
+                      "2004",
+                      "2005",
+                      "2006",
+                      "2007",
+                      "2008",
+                      "2009",
+                      "2010",
+                      "2011",
+                      "2012",
+                      "2013",
+                      "2014",
+                      "2015",
+                      "2016",
+                      "2017",
+                      "2018",
+                      "2019",
+                      "2020"))
+colnames(OILdf)[3] <- "date"
+
+SPX <- tq_get("^GSPC", from="2000-01-01",to="2020-12-31")
+SPX$r <- c(NA, diff(log(SPX$adjusted))) ; SPX <- SPX[-1,]
+SPX$R <- exp(SPX$r) - 1
+SPX <- SPX[SPX$date %in% GOLD$date,]
+SPX2000 <- SPX[grepl("2000",SPX$date),]
+SPX2001 <- SPX[grepl("2001",SPX$date),]
+SPX2002 <- SPX[grepl("2002",SPX$date),]
+SPX2003 <- SPX[grepl("2003",SPX$date),]
+SPX2004 <- SPX[grepl("2004",SPX$date),]
+SPX2005 <- SPX[grepl("2005",SPX$date),]
+SPX2006 <- SPX[grepl("2006",SPX$date),]
+SPX2007 <- SPX[grepl("2007",SPX$date),]
+SPX2008 <- SPX[grepl("2008",SPX$date),]
+SPX2009 <- SPX[grepl("2009",SPX$date),]
+SPX2010 <- SPX[grepl("2010",SPX$date),]
+SPX2011 <- SPX[grepl("2011",SPX$date),]
+SPX2012 <- SPX[grepl("2012",SPX$date),]
+SPX2013 <- SPX[grepl("2013",SPX$date),]
+SPX2014 <- SPX[grepl("2014",SPX$date),]
+SPX2015 <- SPX[grepl("2015",SPX$date),]
+SPX2016 <- SPX[grepl("2016",SPX$date),]
+SPX2017 <- SPX[grepl("2017",SPX$date),]
+SPX2018 <- SPX[grepl("2018",SPX$date),]
+SPX2019 <- SPX[grepl("2019",SPX$date),]
+SPX2020 <- SPX[grepl("2020",SPX$date),]
+
+GOLD <- GOLD[GOLD$date %in% SPX$date,]
+GOLD2000 <- GOLD[grepl("2000",GOLD$date),]
+GOLD2001 <- GOLD[grepl("2001",GOLD$date),]
+GOLD2002 <- GOLD[grepl("2002",GOLD$date),]
+GOLD2003 <- GOLD[grepl("2003",GOLD$date),]
+GOLD2004 <- GOLD[grepl("2004",GOLD$date),]
+GOLD2005 <- GOLD[grepl("2005",GOLD$date),]
+GOLD2006 <- GOLD[grepl("2006",GOLD$date),]
+GOLD2007 <- GOLD[grepl("2007",GOLD$date),]
+GOLD2008 <- GOLD[grepl("2008",GOLD$date),]
+GOLD2009 <- GOLD[grepl("2009",GOLD$date),]
+GOLD2010 <- GOLD[grepl("2010",GOLD$date),]
+GOLD2011 <- GOLD[grepl("2011",GOLD$date),]
+GOLD2012 <- GOLD[grepl("2012",GOLD$date),]
+GOLD2013 <- GOLD[grepl("2013",GOLD$date),]
+GOLD2014 <- GOLD[grepl("2014",GOLD$date),]
+GOLD2015 <- GOLD[grepl("2015",GOLD$date),]
+GOLD2016 <- GOLD[grepl("2016",GOLD$date),]
+GOLD2017 <- GOLD[grepl("2017",GOLD$date),]
+GOLD2018 <- GOLD[grepl("2018",GOLD$date),]
+GOLD2019 <- GOLD[grepl("2019",GOLD$date),]
+GOLD2020 <- GOLD[grepl("2020",GOLD$date),]
+
+loutGOLD2000 <- lm(SPX2000$R ~ GOLD2000$R )
+loutGOLD2001 <- lm(SPX2001$R ~ GOLD2001$R )
+loutGOLD2002 <- lm(SPX2002$R ~ GOLD2002$R )
+loutGOLD2003 <- lm(SPX2003$R ~ GOLD2003$R )
+loutGOLD2004 <- lm(SPX2004$R ~ GOLD2004$R )
+loutGOLD2005 <- lm(SPX2005$R ~ GOLD2005$R )
+loutGOLD2006 <- lm(SPX2006$R ~ GOLD2006$R )
+loutGOLD2007 <- lm(SPX2007$R ~ GOLD2007$R )
+loutGOLD2008 <- lm(SPX2008$R ~ GOLD2008$R )
+loutGOLD2009 <- lm(SPX2009$R ~ GOLD2009$R)
+loutGOLD2010 <- lm(SPX2010$R ~ GOLD2010$R)
+loutGOLD2011 <- lm(SPX2011$R ~ GOLD2011$R)
+loutGOLD2012 <- lm(SPX2012$R ~ GOLD2012$R )
+loutGOLD2013 <- lm(SPX2013$R ~ GOLD2013$R )
+loutGOLD2014 <- lm(SPX2014$R ~ GOLD2014$R )
+loutGOLD2015 <- lm(SPX2015$R ~ GOLD2015$R )
+loutGOLD2016 <- lm(SPX2016$R ~ GOLD2016$R )
+loutGOLD2017 <- lm(SPX2017$R ~ GOLD2017$R )
+loutGOLD2018 <- lm(SPX2018$R ~ GOLD2018$R )
+loutGOLD2019 <- lm(SPX2019$R ~ GOLD2019$R )
+loutGOLD2020 <- lm(SPX2020$R ~ GOLD2020$R )
+
+GOLDbeta <- c(loutGOLD2000$coefficients[2],
+            loutGOLD2001$coefficients[2],
+            loutGOLD2002$coefficients[2],
+            loutGOLD2003$coefficients[2],
+            loutGOLD2004$coefficients[2],
+            loutGOLD2005$coefficients[2],
+            loutGOLD2006$coefficients[2],
+            loutGOLD2007$coefficients[2],
+            loutGOLD2008$coefficients[2],
+            loutGOLD2009$coefficients[2],
+            loutGOLD2010$coefficients[2],
+            loutGOLD2011$coefficients[2],
+            loutGOLD2012$coefficients[2],
+            loutGOLD2013$coefficients[2],
+            loutGOLD2014$coefficients[2],
+            loutGOLD2015$coefficients[2],
+            loutGOLD2016$coefficients[2],
+            loutGOLD2017$coefficients[2],
+            loutGOLD2018$coefficients[2],
+            loutGOLD2019$coefficients[2],
+            loutGOLD2020$coefficients[2])
+
+GOLDsd <- c(
+  sd(GOLD2000$R),
+  sd(GOLD2001$R),
+  sd(GOLD2002$R),
+  sd(GOLD2003$R),
+  sd(GOLD2004$R),
+  sd(GOLD2005$R),
+  sd(GOLD2006$R),
+  sd(GOLD2007$R),
+  sd(GOLD2008$R),
+  sd(GOLD2009$R),
+  sd(GOLD2010$R),
+  sd(GOLD2011$R),
+  sd(GOLD2012$R),
+  sd(GOLD2013$R),
+  sd(GOLD2014$R),
+  sd(GOLD2015$R),
+  sd(GOLD2016$R),
+  sd(GOLD2017$R),
+  sd(GOLD2018$R),
+  sd(GOLD2019$R),
+  sd(GOLD2020$R)
+)
+
+GOLDdf <- cbind(GOLDbeta,GOLDsd)
+GOLDdf <- cbind(GOLDdf, c("2000",
+                      "2001",
+                      "2002",
+                      "2003",
+                      "2004",
+                      "2005",
+                      "2006",
+                      "2007",
+                      "2008",
+                      "2009",
+                      "2010",
+                      "2011",
+                      "2012",
+                      "2013",
+                      "2014",
+                      "2015",
+                      "2016",
+                      "2017",
+                      "2018",
+                      "2019",
+                      "2020"))
+colnames(GOLDdf)[3] <- "date"
+
+SPX <- tq_get("^GSPC", from="2000-01-01",to="2020-12-31")
+SPX$r <- c(NA, diff(log(SPX$adjusted))) ; SPX <- SPX[-1,]
+SPX$R <- exp(SPX$r) - 1
+SPX <- SPX[SPX$date %in% SILVER$date,]
+SPX2000 <- SPX[grepl("2000",SPX$date),]
+SPX2001 <- SPX[grepl("2001",SPX$date),]
+SPX2002 <- SPX[grepl("2002",SPX$date),]
+SPX2003 <- SPX[grepl("2003",SPX$date),]
+SPX2004 <- SPX[grepl("2004",SPX$date),]
+SPX2005 <- SPX[grepl("2005",SPX$date),]
+SPX2006 <- SPX[grepl("2006",SPX$date),]
+SPX2007 <- SPX[grepl("2007",SPX$date),]
+SPX2008 <- SPX[grepl("2008",SPX$date),]
+SPX2009 <- SPX[grepl("2009",SPX$date),]
+SPX2010 <- SPX[grepl("2010",SPX$date),]
+SPX2011 <- SPX[grepl("2011",SPX$date),]
+SPX2012 <- SPX[grepl("2012",SPX$date),]
+SPX2013 <- SPX[grepl("2013",SPX$date),]
+SPX2014 <- SPX[grepl("2014",SPX$date),]
+SPX2015 <- SPX[grepl("2015",SPX$date),]
+SPX2016 <- SPX[grepl("2016",SPX$date),]
+SPX2017 <- SPX[grepl("2017",SPX$date),]
+SPX2018 <- SPX[grepl("2018",SPX$date),]
+SPX2019 <- SPX[grepl("2019",SPX$date),]
+SPX2020 <- SPX[grepl("2020",SPX$date),]
+
+SILVER <- SILVER[SILVER$date %in% SPX$date,]
+SILVER2017 <- SILVER[grepl("2017",SILVER$date),]
+SILVER2018 <- SILVER[grepl("2018",SILVER$date),]
+SILVER2019 <- SILVER[grepl("2019",SILVER$date),]
+SILVER2020 <- SILVER[grepl("2020",SILVER$date),]
+
+loutSILVER2017 <- lm(SPX2017$R ~ SILVER2017$R )
+loutSILVER2018 <- lm(SPX2018$R ~ SILVER2018$R )
+loutSILVER2019 <- lm(SPX2019$R ~ SILVER2019$R )
+loutSILVER2020 <- lm(SPX2020$R ~ SILVER2020$R )
+
+SILVERbeta <- c(
+            loutSILVER2017$coefficients[2],
+            loutSILVER2018$coefficients[2],
+            loutSILVER2019$coefficients[2],
+            loutSILVER2020$coefficients[2])
+
+SILVERsd <- c(
+  sd(SILVER2017$R),
+  sd(SILVER2018$R),
+  sd(SILVER2019$R),
+  sd(SILVER2020$R)
+)
+
+SILVERdf <- cbind(SILVERbeta,SILVERsd)
+SILVERdf <- cbind(SILVERdf, c(
+                      "2017",
+                      "2018",
+                      "2019",
+                      "2020"))
+colnames(SILVERdf)[3] <- "date"
+
+SPX <- tq_get("^GSPC", from="2000-01-01",to="2020-12-31")
+SPX$r <- c(NA, diff(log(SPX$adjusted))) ; SPX <- SPX[-1,]
+SPX$R <- exp(SPX$r) - 1
+SPX <- SPX[SPX$date %in% BOND1$date,]
+SPX2000 <- SPX[grepl("2000",SPX$date),]
+SPX2001 <- SPX[grepl("2001",SPX$date),]
+SPX2002 <- SPX[grepl("2002",SPX$date),]
+SPX2003 <- SPX[grepl("2003",SPX$date),]
+SPX2004 <- SPX[grepl("2004",SPX$date),]
+SPX2005 <- SPX[grepl("2005",SPX$date),]
+SPX2006 <- SPX[grepl("2006",SPX$date),]
+SPX2007 <- SPX[grepl("2007",SPX$date),]
+SPX2008 <- SPX[grepl("2008",SPX$date),]
+SPX2009 <- SPX[grepl("2009",SPX$date),]
+SPX2010 <- SPX[grepl("2010",SPX$date),]
+SPX2011 <- SPX[grepl("2011",SPX$date),]
+SPX2012 <- SPX[grepl("2012",SPX$date),]
+SPX2013 <- SPX[grepl("2013",SPX$date),]
+SPX2014 <- SPX[grepl("2014",SPX$date),]
+SPX2015 <- SPX[grepl("2015",SPX$date),]
+SPX2016 <- SPX[grepl("2016",SPX$date),]
+SPX2017 <- SPX[grepl("2017",SPX$date),]
+SPX2018 <- SPX[grepl("2018",SPX$date),]
+SPX2019 <- SPX[grepl("2019",SPX$date),]
+SPX2020 <- SPX[grepl("2020",SPX$date),]
+
+BOND1 <- BOND1[BOND1$date %in% SPX$date,]
+BOND12001 <- BOND1[grepl("2001",BOND1$date),]
+BOND12002 <- BOND1[grepl("2002",BOND1$date),]
+BOND12003 <- BOND1[grepl("2003",BOND1$date),]
+BOND12004 <- BOND1[grepl("2004",BOND1$date),]
+BOND12005 <- BOND1[grepl("2005",BOND1$date),]
+BOND12006 <- BOND1[grepl("2006",BOND1$date),]
+BOND12007 <- BOND1[grepl("2007",BOND1$date),]
+BOND12008 <- BOND1[grepl("2008",BOND1$date),]
+BOND12009 <- BOND1[grepl("2009",BOND1$date),]
+BOND12010 <- BOND1[grepl("2010",BOND1$date),]
+BOND12011 <- BOND1[grepl("2011",BOND1$date),]
+BOND12012 <- BOND1[grepl("2012",BOND1$date),]
+BOND12013 <- BOND1[grepl("2013",BOND1$date),]
+BOND12014 <- BOND1[grepl("2014",BOND1$date),]
+BOND12015 <- BOND1[grepl("2015",BOND1$date),]
+BOND12016 <- BOND1[grepl("2016",BOND1$date),]
+BOND12017 <- BOND1[grepl("2017",BOND1$date),]
+BOND12018 <- BOND1[grepl("2018",BOND1$date),]
+BOND12019 <- BOND1[grepl("2019",BOND1$date),]
+BOND12020 <- BOND1[grepl("2020",BOND1$date),]
+
+loutBOND12001 <- lm(SPX2001$R ~ BOND12001$R )
+loutBOND12002 <- lm(SPX2002$R ~ BOND12002$R )
+loutBOND12003 <- lm(SPX2003$R ~ BOND12003$R )
+loutBOND12004 <- lm(SPX2004$R ~ BOND12004$R )
+loutBOND12005 <- lm(SPX2005$R ~ BOND12005$R )
+loutBOND12006 <- lm(SPX2006$R ~ BOND12006$R )
+loutBOND12007 <- lm(SPX2007$R ~ BOND12007$R )
+loutBOND12008 <- lm(SPX2008$R ~ BOND12008$R )
+loutBOND12009 <- lm(SPX2009$R ~ BOND12009$R)
+loutBOND12010 <- lm(SPX2010$R ~ BOND12010$R)
+loutBOND12011 <- lm(SPX2011$R ~ BOND12011$R)
+loutBOND12012 <- lm(SPX2012$R ~ BOND12012$R )
+loutBOND12013 <- lm(SPX2013$R ~ BOND12013$R )
+loutBOND12014 <- lm(SPX2014$R ~ BOND12014$R )
+loutBOND12015 <- lm(SPX2015$R ~ BOND12015$R )
+loutBOND12016 <- lm(SPX2016$R ~ BOND12016$R )
+loutBOND12017 <- lm(SPX2017$R ~ BOND12017$R )
+loutBOND12018 <- lm(SPX2018$R ~ BOND12018$R )
+loutBOND12019 <- lm(SPX2019$R ~ BOND12019$R )
+loutBOND12020 <- lm(SPX2020$R ~ BOND12020$R )
+
+BOND1beta <- c(
+            loutBOND12001$coefficients[2],
+            loutBOND12002$coefficients[2],
+            loutBOND12003$coefficients[2],
+            loutBOND12004$coefficients[2],
+            loutBOND12005$coefficients[2],
+            loutBOND12006$coefficients[2],
+            loutBOND12007$coefficients[2],
+            loutBOND12008$coefficients[2],
+            loutBOND12009$coefficients[2],
+            loutBOND12010$coefficients[2],
+            loutBOND12011$coefficients[2],
+            loutBOND12012$coefficients[2],
+            loutBOND12013$coefficients[2],
+            loutBOND12014$coefficients[2],
+            loutBOND12015$coefficients[2],
+            loutBOND12016$coefficients[2],
+            loutBOND12017$coefficients[2],
+            loutBOND12018$coefficients[2],
+            loutBOND12019$coefficients[2],
+            loutBOND12020$coefficients[2])
+
+BOND1sd <- c(
+  sd(BOND12001$R),
+  sd(BOND12002$R),
+  sd(BOND12003$R),
+  sd(BOND12004$R),
+  sd(BOND12005$R),
+  sd(BOND12006$R),
+  sd(BOND12007$R),
+  sd(BOND12008$R),
+  sd(BOND12009$R),
+  sd(BOND12010$R),
+  sd(BOND12011$R),
+  sd(BOND12012$R),
+  sd(BOND12013$R),
+  sd(BOND12014$R),
+  sd(BOND12015$R),
+  sd(BOND12016$R),
+  sd(BOND12017$R),
+  sd(BOND12018$R),
+  sd(BOND12019$R),
+  sd(BOND12020$R)
+)
+
+BOND1df <- cbind(BOND1beta,BOND1sd)
+BOND1df <- cbind(BOND1df, c(
+                      "2001",
+                      "2002",
+                      "2003",
+                      "2004",
+                      "2005",
+                      "2006",
+                      "2007",
+                      "2008",
+                      "2009",
+                      "2010",
+                      "2011",
+                      "2012",
+                      "2013",
+                      "2014",
+                      "2015",
+                      "2016",
+                      "2017",
+                      "2018",
+                      "2019",
+                      "2020"))
+colnames(BOND1df)[3] <- "date"
+
+SPX <- tq_get("^GSPC", from="2000-01-01",to="2020-12-31")
+SPX$r <- c(NA, diff(log(SPX$adjusted))) ; SPX <- SPX[-1,]
+SPX$R <- exp(SPX$r) - 1
+SPX <- SPX[SPX$date %in% BOND2$date,]
+SPX2000 <- SPX[grepl("2000",SPX$date),]
+SPX2001 <- SPX[grepl("2001",SPX$date),]
+SPX2002 <- SPX[grepl("2002",SPX$date),]
+SPX2003 <- SPX[grepl("2003",SPX$date),]
+SPX2004 <- SPX[grepl("2004",SPX$date),]
+SPX2005 <- SPX[grepl("2005",SPX$date),]
+SPX2006 <- SPX[grepl("2006",SPX$date),]
+SPX2007 <- SPX[grepl("2007",SPX$date),]
+SPX2008 <- SPX[grepl("2008",SPX$date),]
+SPX2009 <- SPX[grepl("2009",SPX$date),]
+SPX2010 <- SPX[grepl("2010",SPX$date),]
+SPX2011 <- SPX[grepl("2011",SPX$date),]
+SPX2012 <- SPX[grepl("2012",SPX$date),]
+SPX2013 <- SPX[grepl("2013",SPX$date),]
+SPX2014 <- SPX[grepl("2014",SPX$date),]
+SPX2015 <- SPX[grepl("2015",SPX$date),]
+SPX2016 <- SPX[grepl("2016",SPX$date),]
+SPX2017 <- SPX[grepl("2017",SPX$date),]
+SPX2018 <- SPX[grepl("2018",SPX$date),]
+SPX2019 <- SPX[grepl("2019",SPX$date),]
+SPX2020 <- SPX[grepl("2020",SPX$date),]
+
+BOND2 <- BOND2[BOND2$date %in% SPX$date,]
+BOND22000 <- BOND2[grepl("2000",BOND2$date),]
+BOND22001 <- BOND2[grepl("2001",BOND2$date),]
+BOND22002 <- BOND2[grepl("2002",BOND2$date),]
+BOND22003 <- BOND2[grepl("2003",BOND2$date),]
+BOND22004 <- BOND2[grepl("2004",BOND2$date),]
+BOND22005 <- BOND2[grepl("2005",BOND2$date),]
+BOND22006 <- BOND2[grepl("2006",BOND2$date),]
+BOND22007 <- BOND2[grepl("2007",BOND2$date),]
+BOND22008 <- BOND2[grepl("2008",BOND2$date),]
+BOND22009 <- BOND2[grepl("2009",BOND2$date),]
+BOND22010 <- BOND2[grepl("2010",BOND2$date),]
+BOND22011 <- BOND2[grepl("2011",BOND2$date),]
+BOND22012 <- BOND2[grepl("2012",BOND2$date),]
+BOND22013 <- BOND2[grepl("2013",BOND2$date),]
+BOND22014 <- BOND2[grepl("2014",BOND2$date),]
+BOND22015 <- BOND2[grepl("2015",BOND2$date),]
+BOND22016 <- BOND2[grepl("2016",BOND2$date),]
+BOND22017 <- BOND2[grepl("2017",BOND2$date),]
+BOND22018 <- BOND2[grepl("2018",BOND2$date),]
+BOND22019 <- BOND2[grepl("2019",BOND2$date),]
+BOND22020 <- BOND2[grepl("2020",BOND2$date),]
+
+loutBOND22000 <- lm(SPX2000$R ~ BOND22000$R )
+loutBOND22001 <- lm(SPX2001$R ~ BOND22001$R )
+loutBOND22002 <- lm(SPX2002$R ~ BOND22002$R )
+loutBOND22003 <- lm(SPX2003$R ~ BOND22003$R )
+loutBOND22004 <- lm(SPX2004$R ~ BOND22004$R )
+loutBOND22005 <- lm(SPX2005$R ~ BOND22005$R )
+loutBOND22006 <- lm(SPX2006$R ~ BOND22006$R )
+loutBOND22007 <- lm(SPX2007$R ~ BOND22007$R )
+loutBOND22008 <- lm(SPX2008$R ~ BOND22008$R )
+loutBOND22009 <- lm(SPX2009$R ~ BOND22009$R)
+loutBOND22010 <- lm(SPX2010$R ~ BOND22010$R)
+loutBOND22011 <- lm(SPX2011$R ~ BOND22011$R)
+loutBOND22012 <- lm(SPX2012$R ~ BOND22012$R )
+loutBOND22013 <- lm(SPX2013$R ~ BOND22013$R )
+loutBOND22014 <- lm(SPX2014$R ~ BOND22014$R )
+loutBOND22015 <- lm(SPX2015$R ~ BOND22015$R )
+loutBOND22016 <- lm(SPX2016$R ~ BOND22016$R )
+loutBOND22017 <- lm(SPX2017$R ~ BOND22017$R )
+loutBOND22018 <- lm(SPX2018$R ~ BOND22018$R )
+loutBOND22019 <- lm(SPX2019$R ~ BOND22019$R )
+loutBOND22020 <- lm(SPX2020$R ~ BOND22020$R )
+
+BOND2beta <- c(loutBOND22000$coefficients[2],
+            loutBOND22001$coefficients[2],
+            loutBOND22002$coefficients[2],
+            loutBOND22003$coefficients[2],
+            loutBOND22004$coefficients[2],
+            loutBOND22005$coefficients[2],
+            loutBOND22006$coefficients[2],
+            loutBOND22007$coefficients[2],
+            loutBOND22008$coefficients[2],
+            loutBOND22009$coefficients[2],
+            loutBOND22010$coefficients[2],
+            loutBOND22011$coefficients[2],
+            loutBOND22012$coefficients[2],
+            loutBOND22013$coefficients[2],
+            loutBOND22014$coefficients[2],
+            loutBOND22015$coefficients[2],
+            loutBOND22016$coefficients[2],
+            loutBOND22017$coefficients[2],
+            loutBOND22018$coefficients[2],
+            loutBOND22019$coefficients[2],
+            loutBOND22020$coefficients[2])
+
+BOND2sd <- c(
+  sd(BOND22000$R),
+  sd(BOND22001$R),
+  sd(BOND22002$R),
+  sd(BOND22003$R),
+  sd(BOND22004$R),
+  sd(BOND22005$R),
+  sd(BOND22006$R),
+  sd(BOND22007$R),
+  sd(BOND22008$R),
+  sd(BOND22009$R),
+  sd(BOND22010$R),
+  sd(BOND22011$R),
+  sd(BOND22012$R),
+  sd(BOND22013$R),
+  sd(BOND22014$R),
+  sd(BOND22015$R),
+  sd(BOND22016$R),
+  sd(BOND22017$R),
+  sd(BOND22018$R),
+  sd(BOND22019$R),
+  sd(BOND22020$R)
+)
+
+BOND2df <- cbind(BOND2beta,BOND2sd)
+BOND2df <- cbind(BOND2df, c("2000",
+                      "2001",
+                      "2002",
+                      "2003",
+                      "2004",
+                      "2005",
+                      "2006",
+                      "2007",
+                      "2008",
+                      "2009",
+                      "2010",
+                      "2011",
+                      "2012",
+                      "2013",
+                      "2014",
+                      "2015",
+                      "2016",
+                      "2017",
+                      "2018",
+                      "2019",
+                      "2020"))
+colnames(BOND2df)[3] <- "date"
+
+SPX <- tq_get("^GSPC", from="2000-01-01",to="2020-12-31")
+SPX$r <- c(NA, diff(log(SPX$adjusted))) ; SPX <- SPX[-1,]
+SPX$R <- exp(SPX$r) - 1
+SPX <- SPX[SPX$date %in% BOND3$date,]
+SPX2000 <- SPX[grepl("2000",SPX$date),]
+SPX2001 <- SPX[grepl("2001",SPX$date),]
+SPX2002 <- SPX[grepl("2002",SPX$date),]
+SPX2003 <- SPX[grepl("2003",SPX$date),]
+SPX2004 <- SPX[grepl("2004",SPX$date),]
+SPX2005 <- SPX[grepl("2005",SPX$date),]
+SPX2006 <- SPX[grepl("2006",SPX$date),]
+SPX2007 <- SPX[grepl("2007",SPX$date),]
+SPX2008 <- SPX[grepl("2008",SPX$date),]
+SPX2009 <- SPX[grepl("2009",SPX$date),]
+SPX2010 <- SPX[grepl("2010",SPX$date),]
+SPX2011 <- SPX[grepl("2011",SPX$date),]
+SPX2012 <- SPX[grepl("2012",SPX$date),]
+SPX2013 <- SPX[grepl("2013",SPX$date),]
+SPX2014 <- SPX[grepl("2014",SPX$date),]
+SPX2015 <- SPX[grepl("2015",SPX$date),]
+SPX2016 <- SPX[grepl("2016",SPX$date),]
+SPX2017 <- SPX[grepl("2017",SPX$date),]
+SPX2018 <- SPX[grepl("2018",SPX$date),]
+SPX2019 <- SPX[grepl("2019",SPX$date),]
+SPX2020 <- SPX[grepl("2020",SPX$date),]
+
+BOND3 <- BOND3[BOND3$date %in% SPX$date,]
+BOND32000 <- BOND3[grepl("2000",BOND3$date),]
+BOND32001 <- BOND3[grepl("2001",BOND3$date),]
+BOND32002 <- BOND3[grepl("2002",BOND3$date),]
+BOND32003 <- BOND3[grepl("2003",BOND3$date),]
+BOND32004 <- BOND3[grepl("2004",BOND3$date),]
+BOND32005 <- BOND3[grepl("2005",BOND3$date),]
+BOND32006 <- BOND3[grepl("2006",BOND3$date),]
+BOND32007 <- BOND3[grepl("2007",BOND3$date),]
+BOND32008 <- BOND3[grepl("2008",BOND3$date),]
+BOND32009 <- BOND3[grepl("2009",BOND3$date),]
+BOND32010 <- BOND3[grepl("2010",BOND3$date),]
+BOND32011 <- BOND3[grepl("2011",BOND3$date),]
+BOND32012 <- BOND3[grepl("2012",BOND3$date),]
+BOND32013 <- BOND3[grepl("2013",BOND3$date),]
+BOND32014 <- BOND3[grepl("2014",BOND3$date),]
+BOND32015 <- BOND3[grepl("2015",BOND3$date),]
+BOND32016 <- BOND3[grepl("2016",BOND3$date),]
+BOND32017 <- BOND3[grepl("2017",BOND3$date),]
+BOND32018 <- BOND3[grepl("2018",BOND3$date),]
+BOND32019 <- BOND3[grepl("2019",BOND3$date),]
+BOND32020 <- BOND3[grepl("2020",BOND3$date),]
+
+loutBOND32000 <- lm(SPX2000$R ~ BOND32000$R )
+loutBOND32001 <- lm(SPX2001$R ~ BOND32001$R )
+loutBOND32002 <- lm(SPX2002$R ~ BOND32002$R )
+loutBOND32003 <- lm(SPX2003$R ~ BOND32003$R )
+loutBOND32004 <- lm(SPX2004$R ~ BOND32004$R )
+loutBOND32005 <- lm(SPX2005$R ~ BOND32005$R )
+loutBOND32006 <- lm(SPX2006$R ~ BOND32006$R )
+loutBOND32007 <- lm(SPX2007$R ~ BOND32007$R )
+loutBOND32008 <- lm(SPX2008$R ~ BOND32008$R )
+loutBOND32009 <- lm(SPX2009$R ~ BOND32009$R)
+loutBOND32010 <- lm(SPX2010$R ~ BOND32010$R)
+loutBOND32011 <- lm(SPX2011$R ~ BOND32011$R)
+loutBOND32012 <- lm(SPX2012$R ~ BOND32012$R )
+loutBOND32013 <- lm(SPX2013$R ~ BOND32013$R )
+loutBOND32014 <- lm(SPX2014$R ~ BOND32014$R )
+loutBOND32015 <- lm(SPX2015$R ~ BOND32015$R )
+loutBOND32016 <- lm(SPX2016$R ~ BOND32016$R )
+loutBOND32017 <- lm(SPX2017$R ~ BOND32017$R )
+loutBOND32018 <- lm(SPX2018$R ~ BOND32018$R )
+loutBOND32019 <- lm(SPX2019$R ~ BOND32019$R )
+loutBOND32020 <- lm(SPX2020$R ~ BOND32020$R )
+
+BOND3beta <- c(loutBOND32000$coefficients[2],
+            loutBOND32001$coefficients[2],
+            loutBOND32002$coefficients[2],
+            loutBOND32003$coefficients[2],
+            loutBOND32004$coefficients[2],
+            loutBOND32005$coefficients[2],
+            loutBOND32006$coefficients[2],
+            loutBOND32007$coefficients[2],
+            loutBOND32008$coefficients[2],
+            loutBOND32009$coefficients[2],
+            loutBOND32010$coefficients[2],
+            loutBOND32011$coefficients[2],
+            loutBOND32012$coefficients[2],
+            loutBOND32013$coefficients[2],
+            loutBOND32014$coefficients[2],
+            loutBOND32015$coefficients[2],
+            loutBOND32016$coefficients[2],
+            loutBOND32017$coefficients[2],
+            loutBOND32018$coefficients[2],
+            loutBOND32019$coefficients[2],
+            loutBOND32020$coefficients[2])
+
+BOND3sd <- c(
+  sd(BOND32000$R),
+  sd(BOND32001$R),
+  sd(BOND32002$R),
+  sd(BOND32003$R),
+  sd(BOND32004$R),
+  sd(BOND32005$R),
+  sd(BOND32006$R),
+  sd(BOND32007$R),
+  sd(BOND32008$R),
+  sd(BOND32009$R),
+  sd(BOND32010$R),
+  sd(BOND32011$R),
+  sd(BOND32012$R),
+  sd(BOND32013$R),
+  sd(BOND32014$R),
+  sd(BOND32015$R),
+  sd(BOND32016$R),
+  sd(BOND32017$R),
+  sd(BOND32018$R),
+  sd(BOND32019$R),
+  sd(BOND32020$R)
+)
+
+BOND3df <- cbind(BOND3beta,BOND3sd)
+BOND3df <- cbind(BOND3df, c("2000",
+                      "2001",
+                      "2002",
+                      "2003",
+                      "2004",
+                      "2005",
+                      "2006",
+                      "2007",
+                      "2008",
+                      "2009",
+                      "2010",
+                      "2011",
+                      "2012",
+                      "2013",
+                      "2014",
+                      "2015",
+                      "2016",
+                      "2017",
+                      "2018",
+                      "2019",
+                      "2020"))
+colnames(BOND3df)[3] <- "date"
+
+stocks <- as.data.frame(rbind(AAPLdf,PGdf,AMZNdf))
+colnames(stocks)[1:2] <- c("Beta", "SD")
+stocks$Beta <- as.numeric(stocks$Beta)
+stocks$SD <- as.numeric(stocks$SD)
+print(stocks)
+plot(stocks$SD, stocks$Beta, main="Returns v. Standalone Risk of Stocks");grid()
+comms <- as.data.frame(rbind(OILdf,GOLDdf,SILVERdf))
+colnames(comms)[1:2] <- c("Beta", "SD")
+comms$Beta <- as.numeric(comms$Beta)
+comms$SD <- as.numeric(comms$SD)
+print(comms)
+plot(comms$SD, comms$Beta, main="Returns v. Standalone Risk of Commodities");grid()
+bonds <- as.data.frame(rbind(BOND1df,BOND2df,BOND3df))
+colnames(bonds)[1:2] <- c("Beta", "SD")
+bonds$Beta <- as.numeric(bonds$Beta)
+bonds$SD <- as.numeric(bonds$SD)
+print(bonds)
+plot(bonds$SD, bonds$Beta, main="Returns v. Standalone Risk of Commodities");grid()
+stockslout <- lm(stocks$Beta ~ stocks$SD)
+summary(stockslout)
+commslout <- lm(comms$Beta ~ comms$SD)
+summary(commslout)
+bondslout <- lm(bonds$Beta ~ bonds$SD)
+summary(bondslout)
