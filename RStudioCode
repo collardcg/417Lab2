@@ -8,9 +8,10 @@
 # Commodities: Oil (Via West Texas Intermediate Crude Oil Prices), Gold (Via London Bullion Market Gold Fixing Price), and Silver (Via London Bullion Market Silver Fixing Price)
 # Bonds: Vanguard Total Bond Market Index Fund, Vanguard High-Yield Corporate Fund, and Vanguard Long-Term Investment-Grade Fund
 
-
+# Loading Libraries
 library("tidyquant")
 
+# Loading asset price data
 AAPL <- tq_get("AAPL", from="2000-01-01",to="2020-12-31")
 PG <- tq_get("PG", from="2000-01-01",to="2020-12-31")
 AMZN <- tq_get("AMZN", from="2000-01-01",to="2020-12-31")
@@ -21,6 +22,7 @@ BOND1 <- tq_get("VBTLX", from="2000-01-01",to="2020-12-31")
 BOND2 <- tq_get("VWEHX", from="2000-01-01",to="2020-12-31")
 BOND3 <- tq_get("VWESX", from="2000-01-01",to="2020-12-31")
 
+# Removing NAs
 OIL <- na.omit(OIL)
 GOLD <- na.omit(GOLD)
 SILVER <- na.omit(SILVER)
@@ -28,7 +30,7 @@ BOND1 <- na.omit(BOND1)
 BOND2 <- na.omit(BOND2)
 BOND3 <- na.omit(BOND3)
 
-
+# Computing r
 AAPL$r <- c(NA, diff(log(AAPL$adjusted))) ; AAPL <- AAPL[-1,]
 PG$r <- c(NA, diff(log(PG$adjusted))) ; PG <- PG[-1,]
 AMZN$r <- c(NA, diff(log(AMZN$adjusted))) ; AMZN <- AMZN[-1,]
@@ -39,7 +41,7 @@ BOND1$r <- c(NA, diff(log(BOND1$adjusted))) ; BOND1 <- BOND1[-1,]
 BOND2$r <- c(NA, diff(log(BOND2$adjusted))) ; BOND2 <- BOND2[-1,]
 BOND3$r <- c(NA, diff(log(BOND3$adjusted))) ; BOND3 <- BOND3[-1,]
 
-
+# Computing R
 AAPL$R <- exp(AAPL$r) - 1
 PG$R <- exp(PG$r) - 1
 AMZN$R <- exp(AMZN$r) - 1
@@ -50,6 +52,7 @@ BOND1$R <- exp(BOND1$r) - 1
 BOND2$R <- exp(BOND2$r) - 1
 BOND3$R <- exp(BOND3$r) - 1
 
+# Subsetting SPX data into smaller timeframes
 SPX <- tq_get("^GSPC", from="2000-01-01",to="2020-12-31")
 SPX$r <- c(NA, diff(log(SPX$adjusted))) ; SPX <- SPX[-1,]
 SPX$R <- exp(SPX$r) - 1
@@ -75,7 +78,7 @@ SPX2018 <- SPX[grepl("2018",SPX$date),]
 SPX2019 <- SPX[grepl("2019",SPX$date),]
 SPX2020 <- SPX[grepl("2020",SPX$date),]
 
-
+# Subsetting AAPL data into smaller timeframes
 AAPL2000 <- AAPL[grepl("2000",AAPL$date),]
 AAPL2001 <- AAPL[grepl("2001",AAPL$date),]
 AAPL2002 <- AAPL[grepl("2002",AAPL$date),]
@@ -98,6 +101,7 @@ AAPL2018 <- AAPL[grepl("2018",AAPL$date),]
 AAPL2019 <- AAPL[grepl("2019",AAPL$date),]
 AAPL2020 <- AAPL[grepl("2020",AAPL$date),]
 
+# Calculating Betas for each timeframe
 loutAAPL2000 <- lm(SPX2000$R ~ AAPL2000$R )
 loutAAPL2001 <- lm(SPX2001$R ~ AAPL2001$R )
 loutAAPL2002 <- lm(SPX2002$R ~ AAPL2002$R )
@@ -120,6 +124,7 @@ loutAAPL2018 <- lm(SPX2018$R ~ AAPL2018$R )
 loutAAPL2019 <- lm(SPX2019$R ~ AAPL2019$R )
 loutAAPL2020 <- lm(SPX2020$R ~ AAPL2020$R )
 
+# Combining Betas into one dataset
 AAPLbeta <- c(loutAAPL2000$coefficients[2],
               loutAAPL2001$coefficients[2],
               loutAAPL2002$coefficients[2],
@@ -142,6 +147,7 @@ AAPLbeta <- c(loutAAPL2000$coefficients[2],
               loutAAPL2019$coefficients[2],
               loutAAPL2020$coefficients[2])
 
+# Calculating AAPL Standard Deviation & putting it into one dataframe
 AAPLsd <- c(
   sd(AAPL2000$R),
   sd(AAPL2001$R),
@@ -166,7 +172,10 @@ AAPLsd <- c(
   sd(AAPL2020$R)
 )
 
+# Combining beta & sd into one dataframe
 AAPLdf <- cbind(AAPLbeta,AAPLsd)
+
+# Adding years
 AAPLdf <- cbind(AAPLdf, c("2000",
                           "2001",
                           "2002",
@@ -189,6 +198,8 @@ AAPLdf <- cbind(AAPLdf, c("2000",
                           "2019",
                           "2020"))
 colnames(AAPLdf)[3] <- "date"
+
+# I then repeat the above process for each of the other 8 assets looked at
 
 PG2000 <- PG[grepl("2000",PG$date),]
 PG2001 <- PG[grepl("2001",PG$date),]
@@ -1178,24 +1189,34 @@ BOND3df <- cbind(BOND3df, c("2000",
                       "2020"))
 colnames(BOND3df)[3] <- "date"
 
+# Combining stock data
 stocks <- as.data.frame(rbind(AAPLdf,PGdf,AMZNdf))
 colnames(stocks)[1:2] <- c("Beta", "SD")
+# Making numbers
 stocks$Beta <- as.numeric(stocks$Beta)
 stocks$SD <- as.numeric(stocks$SD)
 print(stocks)
+# Plotting Beta vs. SD
 plot(stocks$SD, stocks$Beta, ylab="Annualized Returns (Beta)", xlab="Standalone Risk (Standard Deviation)");grid()
+# Combining commodity data
 comms <- as.data.frame(rbind(OILdf,GOLDdf,SILVERdf))
 colnames(comms)[1:2] <- c("Beta", "SD")
+# Making numbers
 comms$Beta <- as.numeric(comms$Beta)
 comms$SD <- as.numeric(comms$SD)
 print(comms)
+# Plotting Beta vs. SD
 plot(comms$SD, comms$Beta, ylab="Annualized Returns (Beta)", xlab="Standalone Risk (Standard Deviation)");grid()
+# Combining bond data
 bonds <- as.data.frame(rbind(BOND1df,BOND2df,BOND3df))
 colnames(bonds)[1:2] <- c("Beta", "SD")
+# Making numbers
 bonds$Beta <- as.numeric(bonds$Beta)
 bonds$SD <- as.numeric(bonds$SD)
 print(bonds)
+# Plotting Beta vs. SD
 plot(bonds$SD, bonds$Beta, ylab="Annualized Returns (Beta)", xlab="Standalone Risk (Standard Deviation)");grid()
+# Regressing beta on sd for each asset class
 stockslout <- lm(stocks$Beta ~ stocks$SD)
 summary(stockslout)
 commslout <- lm(comms$Beta ~ comms$SD)
